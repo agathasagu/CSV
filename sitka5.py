@@ -16,6 +16,16 @@ dvinfile = open("death_valley_2018_simple.csv", "r")
 dvcsvfile = csv.reader(dvinfile)
 dvheader_row = next(dvcsvfile)
 
+svtmax_index = header_row.index("TMAX")
+svtmin_index = header_row.index("TMIN")
+svname_index = header_row.index("NAME")
+svdate_index = header_row.index("DATE")
+
+dvtmax_index = dvheader_row.index("TMAX")
+dvtmin_index = dvheader_row.index("TMIN")
+dvname_index = dvheader_row.index("NAME")
+dvdate_index = dvheader_row.index("DATE")
+
 
 highs = []
 lows = []
@@ -26,44 +36,44 @@ dvdate = []
 
 
 for row in csvfile:
-    highs.append(int(row[5]))
-    lows.append(int(row[6]))
-    thedate = datetime.strptime(row[2], "%Y-%m-%d")
+    highs.append(int(row[svtmax_index]))
+    lows.append(int(row[svtmin_index]))
+    thedate = datetime.strptime(row[svdate_index], "%Y-%m-%d")
+    name = row[svname_index]
     dates.append(thedate)
 
 
 for row in dvcsvfile:
     try:
-        high = int(row[4])
-        low = int(row[5])
-        thedate = datetime.strptime(row[2], "%Y-%m-%d")
+        high = int(row[dvtmax_index])
+        low = int(row[dvtmin_index])
+        thedate = datetime.strptime(row[dvdate_index], "%Y-%m-%d")
+        dvname = row[dvname_index]
 
     except ValueError as err:
-        print("There is an error in ", row[2])
+        print("There is an error in ", row[dvdate_index])
     else:
         dvhigh.append(high)
         dvlow.append(low)
         dvdate.append(thedate)
+        dvname = row[dvname_index]
 
 fig = plt.figure()
 
-
-fig.autofmt_xdate()
 
 plt.subplot(2, 1, 1)
 plt.plot(dates, highs, c="red")
 plt.plot(dates, lows, c="blue")
 plt.fill_between(x=dates, y1=highs, y2=lows, facecolor="blue", alpha=0.1)
-plt.title("SITKA AIRPORT, AK US")
+plt.title(name)
 
 plt.subplot(2, 1, 2)
 plt.plot(dvdate, dvlow, c="blue")
 plt.plot(dvdate, dvhigh, c="red")
 plt.fill_between(x=dvdate, y1=dvhigh, y2=dvlow, facecolor="blue", alpha=0.1)
-plt.title("DEATH VALLEY, CA US")
+plt.title(dvname)
 
-plt.suptitle(
-    "Temperature Comparison between SITKA AIRPORT, AK US and DEATH VALLEY, CA US"
-)
+fig.autofmt_xdate()
+plt.suptitle("Temperature Comparison between " + name + " and " + dvname)
 
 plt.show()
